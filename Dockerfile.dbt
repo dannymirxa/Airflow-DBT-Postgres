@@ -1,0 +1,15 @@
+FROM python:3.11-slim
+
+# Install uv for fast python package management
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /bin/
+
+WORKDIR /usr/app
+
+# Install dbt-postgres via uv globally in the container
+RUN uv pip install --system dbt-postgres
+
+# Copy your dbt project files directly into the container
+COPY dbt/airflow_dbt_postgres/ /usr/app/
+
+# Default command runs dbt when container starts
+CMD ["dbt", "run", "--project-dir", "/usr/app", "--profiles-dir", "/usr/app"]

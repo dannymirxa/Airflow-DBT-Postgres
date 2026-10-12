@@ -1,7 +1,7 @@
 services:
   postgres:
-    image: postgres:16-bookworm
-    container_name: postgres_db
+    image: postgres:16
+    container_name: postgres_16_db
     environment:
       POSTGRES_USER: myuser
       POSTGRES_PASSWORD: mypassword
@@ -10,8 +10,32 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data
-      - ./init-db:/docker-entrypoint-initdb.d  # Automatically executes scripts here on first run
+      - ./init-db:/docker-entrypoint-initdb.d
       - ./data:/app/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U myuser -d mydb"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+    networks:
+      - dbt-net
+
+  dbt:
+    build:
+      context: .
+      dockerfile: Dockerfile.dbt
+    container_name: dbt_runner
+    environment:
+      - DBT_PROFILES_DIR=/usr/app
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - dbt-net
 
 volumes:
   pgdata:
+
+networks:
+  dbt-net:
+    driver: bridge

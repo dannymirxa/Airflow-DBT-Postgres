@@ -3,7 +3,7 @@ airflow_dbt_postgres:
   outputs:
     dev:
       type: postgres
-      host: localhost
+      host: postgres
       user: myuser
       password: mypassword
       port: 5432
