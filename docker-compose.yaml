@@ -20,18 +20,26 @@ services:
     networks:
       - dbt-net
 
-  dbt:
+  airflow:
     build:
       context: .
-      dockerfile: Dockerfile.dbt
-    container_name: dbt_runner
+      dockerfile: Dockerfile.airflow
+    container_name: airflow_orchestrator
     environment:
-      - DBT_PROFILES_DIR=/usr/app
+      - AIRFLOW__CORE__EXECUTOR=SequentialExecutor
+      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=sqlite:////opt/airflow/airflow.db
+      - AIRFLOW__CORE__SIMPLE_AUTH_MANAGER_ALL_ADMINS=True  # Bypasses login in Airflow 3.3.2
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./airflow/dags:/opt/airflow/dags
+      - ./dbt/airflow_dbt_postgres:/opt/airflow/dbt
     depends_on:
       postgres:
         condition: service_healthy
     networks:
       - dbt-net
+    command: airflow standalone
 
 volumes:
   pgdata:
