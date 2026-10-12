@@ -10,3 +10,16 @@ airflow_dbt_postgres:
       dbname: mydb
       schema: public
       threads: 4
+
+elementary:
+  target: dev
+  outputs:
+    dev:
+      type: postgres
+      host: postgres
+      user: myuser
+      password: mypassword
+      port: 5432
+      dbname: mydb
+      schema: elementary
+      threads: 4

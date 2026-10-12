@@ -36,3 +36,5 @@ models:
       +materialized: view   # Staging models parse JSON and run as fast database views
     marts:
       +materialized: table  # Final clean reporting models are materialized as physical tables
+  elementary:
+    +schema: "elementary"
